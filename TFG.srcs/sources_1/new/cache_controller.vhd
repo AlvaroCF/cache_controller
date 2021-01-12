@@ -58,6 +58,7 @@ process(I_clk, I_address, I_act, I_w_r,I_rst)
     begin
         if(I_rst = '1') then
             cache_table <= (others => ((I_table_size-1) => '0'));
+            state <= IDLE;
         elsif(I_clk'EVENT AND I_clk = '1') THEN
             if(I_act = '1' or state /= IDLE) then
                index := to_integer(unsigned(I_address(XLEN-1 downto ((XLEN-1)-(COL_WIDTH-1))))); --conversión de la dirección
@@ -121,9 +122,6 @@ process(I_clk, I_address, I_act, I_w_r,I_rst)
                         O_ready_cpu <= '1';
                         O_valid_response <= '0';
                     end if;
-
-
-
                elsif(I_w_r = '0') then --lectura
                     if((cache_table(index)(I_table_size-1) = '1') and (cache_table(index)(I_table_size-3 downto 0) = I_address(I_table_size-1 downto 2))) then
                         O_data_response <= cache_mem(index);   --devuelve los datos solicitados
